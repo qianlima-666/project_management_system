@@ -1,4 +1,7 @@
-// 搜索和操作栏组件
+/**
+ * 项目列表页头部操作栏组件
+ * 包含搜索、新建、批量添加、批量删除、清空等操作
+ */
 import React from 'react'
 import { Input, Button, Space, Typography, Popconfirm, message } from 'antd'
 import {
@@ -20,6 +23,9 @@ interface ProjectHeaderProps {
   setSelectedRowKeys: (keys: React.Key[]) => void
 }
 
+/**
+ * 项目列表头部操作栏
+ */
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   selectedRowKeys,
   onSearch,
@@ -28,6 +34,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onRefetch,
   setSelectedRowKeys
 }) => {
+  // 批量删除选中项目
   const handleBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
       message.warning('请先选择要删除的项目')
@@ -44,6 +51,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
     }
   }
 
+  // 删除所有项目
   const handleDeleteAll = async () => {
     const results = await deleteAllProjects()
     if (results.success) {

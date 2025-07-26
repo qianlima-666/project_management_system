@@ -1,10 +1,6 @@
 /**
  * 项目服务层
- * 
- * 处理项目相关的所有业务逻辑
- * 包括项目的 CRUD 操作、批量操作、缓存管理和日志记录
- * 集成了数据验证、缓存策略和操作日志功能
- * 是项目管理系统的核心业务组件
+ * 处理项目相关的所有业务逻辑，包括 CRUD、批量操作、缓存、日志
  */
 import { prisma } from '../database/connection'
 import { LogService } from './log.service'
@@ -28,7 +24,8 @@ export interface ProjectQueryParams {
 export class ProjectService {
   private static readonly CACHE_PREFIX = 'projects'
   private static readonly CACHE_TTL = 60
-  
+
+  // 查询项目列表，支持分页和搜索
   static async findMany(params: ProjectQueryParams) {
     const { page, limit, search } = params
     const skip = (page - 1) * limit
@@ -75,6 +72,7 @@ export class ProjectService {
     return result
   }
   
+  // 创建单个项目
   static async create(data: ProjectCreateData) {
     // 检查名称唯一性
     const existing = await prisma.project.findUnique({
@@ -101,6 +99,7 @@ export class ProjectService {
     return project
   }
   
+  // 更新项目
   static async update(data: ProjectUpdateData) {
     const { id, ...updateData } = data
     
@@ -140,6 +139,7 @@ export class ProjectService {
     return project
   }
   
+  // 删除单个项目
   static async delete(id: number) {
     const project = await prisma.project.findUnique({ where: { id } })
     if (!project) {
@@ -162,6 +162,7 @@ export class ProjectService {
     return true
   }
   
+  // 批量创建项目
   static async createMany(projectsData: ProjectCreateData[]) {
     const names = projectsData.map(p => p.name)
     const existing = await prisma.project.findMany({
@@ -188,6 +189,7 @@ export class ProjectService {
     return { result, existing }
   }
   
+  // 批量删除项目
   static async deleteMany(ids: number[]) {
     const projects = await prisma.project.findMany({
       where: { id: { in: ids } },
@@ -211,6 +213,7 @@ export class ProjectService {
     return result
   }
   
+  // 删除所有项目
   static async deleteAll() {
     const projects = await prisma.project.findMany()
     const result = await prisma.project.deleteMany({})
@@ -229,6 +232,7 @@ export class ProjectService {
     return result
   }
   
+  // 清除缓存
   private static async invalidateCache() {
     await CacheService.invalidatePattern(`${this.CACHE_PREFIX}:*`)
   }

@@ -1,10 +1,14 @@
-// 批量添加项目组件
+/**
+ * 批量添加项目组件
+ * 支持 Excel 文件上传、预览、筛选、分页、批量提交
+ */
 import React, { useState } from 'react'
 import { Modal, Button, Upload, Table, message, Pagination, Spin, Input } from 'antd'
 import { SearchOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
 import * as XLSX from 'xlsx'
 import { batchAddProjects } from '@/api/projectService'
-// 批量添加项目组件
+
+// 批量添加项目组件参数
 interface BatchAddProps {
     visible: boolean
     onCancel: () => void
@@ -18,7 +22,7 @@ interface ExcelProject {
     description?: string
 }
 
-// 创建项目的 API 响应类型
+// 下载 Excel 模板
 const handleDownloadTemplate = () => {
     // 创建一个简单的 Excel 模板
     const wb = XLSX.utils.book_new();
@@ -30,6 +34,9 @@ const handleDownloadTemplate = () => {
     XLSX.writeFile(wb, '项目批量导入模板.xlsx');
 };
 
+/**
+ * 批量添加项目弹窗
+ */
 const BatchAddProject: React.FC<BatchAddProps> = ({
     visible,
     onCancel,
@@ -67,9 +74,8 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
         return false // 阻止自动上传
     }
 
-    // 清空 set
+    // 清空所有状态
     const clearSets = () => {
-
         setExcelProjects([])
         setProjects([])
         setSelectedRowKeys([])
@@ -274,6 +280,5 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
         </Modal>
     )
 }
-
 
 export default BatchAddProject

@@ -1,10 +1,6 @@
 /**
  * 日志服务层
- * 
- * 负责处理系统操作日志的业务逻辑
- * 包括创建日志记录、查询日志列表、获取日志统计等功能
- * 所有数据库操作都通过统一的 Prisma 连接进行
- * 用于系统审计和操作追踪
+ * 负责系统操作日志的记录、查询、统计
  */
 import { prisma } from '../database/connection'
 
@@ -29,8 +25,6 @@ export class LogService {
   // 创建操作日志
   static async create(data: LogCreateData) {
     try {
-      console.log(
-      
       await prisma.log.create({
         data: {
           operation: data.operation,
@@ -39,7 +33,7 @@ export class LogService {
           newData: data.newData ? JSON.parse(JSON.stringify(data.newData)) : null,
           description: data.description,
         },
-      }));
+      });
     } catch (error) {
       console.error('记录日志失败:', error)
     }

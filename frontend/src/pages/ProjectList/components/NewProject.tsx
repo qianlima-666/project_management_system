@@ -1,3 +1,7 @@
+/**
+ * 新建/编辑项目弹窗组件
+ * 支持表单校验与提交
+ */
 import React, { useState } from 'react'
 import { Modal, Form, Input, Button, message } from 'antd'
 import { addProject, updateProject } from '@/api/projectService'
@@ -10,6 +14,9 @@ interface NewProjectProps {
   project: Project | null
 }
 
+/**
+ * 新建或编辑项目表单
+ */
 const NewProject: React.FC<NewProjectProps> = ({
   visible,
   onCancel,
@@ -19,6 +26,7 @@ const NewProject: React.FC<NewProjectProps> = ({
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
+  // 弹窗打开时初始化表单
   React.useEffect(() => {
     if (visible && project) {
       form.setFieldsValue(project)
@@ -27,6 +35,7 @@ const NewProject: React.FC<NewProjectProps> = ({
     }
   }, [visible, project, form])
 
+  // 提交表单
   const handleSubmit = async () => {
     try {
       setLoading(true)

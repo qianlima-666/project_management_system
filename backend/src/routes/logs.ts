@@ -1,10 +1,6 @@
 /**
  * 日志路由定义
- * 
- * 定义操作日志相关的 API 路由
- * 提供日志查询和统计功能的接口
- * 集成数据验证和控制器方法
- * 用于系统审计和操作追踪的前端接口
+ * 提供日志查询和统计相关的 API 路由
  */
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'

@@ -1,14 +1,11 @@
 /**
  * 缓存服务层
- * 
- * 基于 Redis 的缓存管理服务
- * 提供通用的缓存操作：存储、读取、删除、模式匹配删除
- * 支持自动 JSON 序列化/反序列化
- * 用于提升应用性能，减少数据库查询压力
+ * 基于 Redis 的缓存管理，支持通用缓存操作
  */
 import { redisClient } from '../lib/redis'
 
 export class CacheService {
+  // 生成缓存 key
   static generateKey(prefix: string, params: Record<string, any>): string {
     const sortedParams = Object.keys(params)
       .sort()
@@ -16,7 +13,8 @@ export class CacheService {
       .join(':')
     return `${prefix}:${sortedParams}`
   }
-  
+
+  // 获取缓存
   static async get<T>(key: string): Promise<T | null> {
     try {
       const cached = await redisClient.get(key)
@@ -26,7 +24,8 @@ export class CacheService {
       return null
     }
   }
-  
+
+  // 设置缓存
   static async set(key: string, value: any, ttl: number = 60): Promise<void> {
     try {
       await redisClient.setEx(key, ttl, JSON.stringify(value))
@@ -34,7 +33,8 @@ export class CacheService {
       console.error('缓存写入失败:', error)
     }
   }
-  
+
+  // 删除缓存（支持模式）
   static async del(pattern: string): Promise<void> {
     try {
       const keys = await redisClient.keys(pattern)
@@ -45,7 +45,8 @@ export class CacheService {
       console.error('缓存删除失败:', error)
     }
   }
-  
+
+  // 按模式失效缓存
   static async invalidatePattern(pattern: string): Promise<void> {
     await this.del(pattern)
   }

@@ -1,10 +1,6 @@
 /**
  * 项目路由定义
- * 
- * 使用 Hono 框架定义项目相关的 API 路由
- * 集成数据验证中间件和控制器方法
- * 提供完整的项目 CRUD 操作接口
- * 包括单个操作和批量操作的路由定义
+ * 提供项目相关的 RESTful API 路由
  */
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'

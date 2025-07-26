@@ -1,3 +1,7 @@
+/**
+ * 应用入口文件
+ * 配置 React Query、Ant Design 主题，挂载根组件
+ */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -26,7 +30,7 @@ const theme = {
   }
 }
 
-
+// 挂载根组件
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

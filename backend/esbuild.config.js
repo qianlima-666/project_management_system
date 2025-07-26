@@ -6,7 +6,6 @@
  * 用于生产环境的代码构建和部署
  */
 const esbuild = require('esbuild');
-const { copy } = require('esbuild-plugin-copy');
 
 esbuild.build({
   entryPoints: ['src/index.ts'],

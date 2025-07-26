@@ -1,4 +1,7 @@
-// 表格组件
+/**
+ * 项目表格组件
+ * 展示项目列表，支持排序、选择、编辑、删除等操作
+ */
 import React from 'react'
 import { Table, Button, Space, Popconfirm, Spin } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -14,6 +17,9 @@ interface ProjectTableProps {
   onDelete: (id: number) => void
 }
 
+/**
+ * 项目列表表格
+ */
 const ProjectTable: React.FC<ProjectTableProps> = ({
   data,
   loading,
@@ -23,6 +29,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
   onEdit,
   onDelete
 }) => {
+  // 表格列定义
   const columns = [
     {
       title: 'ID',
@@ -80,7 +87,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
     }
   ]
 
-
+  // 渲染表格
   return (
     <Spin spinning={loading}>
       <Table
