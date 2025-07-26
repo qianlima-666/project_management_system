@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "node esbuild.config.js",
+    "postbuild": "cp -r node_modules/.prisma/client dist/ || xcopy /E /I node_modules\\.prisma\\client dist\\.prisma\\client",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@hono/node-server": "^1.17.1",
+    "@hono/zod-validator": "^0.7.2",
+    "@prisma/client": "^6.12.0",
+    "@types/node": "^24.1.0",
+    "dotenv": "^17.2.0",
+    "hono": "^4.8.5",
+    "react-router-dom": "^6.20.1",
+    "redis": "^5.6.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "esbuild": "^0.25.8",
+    "esbuild-plugin-copy": "^2.1.1",
+    "prisma": "^6.12.0"
+  }
+}

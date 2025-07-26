@@ -1,0 +1,16 @@
+/**
+ * esbuild 构建配置
+ * 
+ * 定义项目的打包和构建规则
+ * 配置 TypeScript 编译、依赖打包、文件复制等
+ * 用于生产环境的代码构建和部署
+ */
+const esbuild = require('esbuild');
+const { copy } = require('esbuild-plugin-copy');
+
+esbuild.build({
+  entryPoints: ['src/index.ts'],
+  bundle: true,
+  platform: 'node',
+  outfile: 'dist/index.js'
+}).catch(() => process.exit(1));

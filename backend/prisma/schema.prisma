@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Log {
+  id          Int      @id @default(autoincrement())
+  operation   String   // CREATE, UPDATE, DELETE, BATCH_CREATE, BATCH_DELETE, DELETE_ALL
+  tableName   String   // 表名
+  oldData     Json?    // 操作前的数据
+  newData     Json?    // 操作后的数据
+  description String?  // 操作描述
+  createdAt   DateTime @default(now())
+  
+  @@map("logs")
+}
