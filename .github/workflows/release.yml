@@ -1,0 +1,194 @@
+name: 发布版本(Release builds)
+
+on:
+  release:
+    types: [published] # 仅在发布 Release 时触发
+
+permissions:
+  contents: write # 允许上传 Release 附件
+
+jobs:
+  # 主打包发布任务，支持多操作系统和架构
+  release:
+    name: 发布任务
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # ========================================================================
+      # 构建、打包、发布
+      # ========================================================================
+
+      - name: 修改 Prisma schema.prisma [添加所有平台和架构]
+        working-directory: ./backend
+        run: |
+          sed -i 's/binaryTargets = .*/binaryTargets = ["darwin","darwin-arm64","windows","linux-musl-openssl-3.0.x","linux-musl","linux-musl-arm64-openssl-3.0.x","linux-musl-arm64-openssl-1.1.x","debian-openssl-1.0.x","debian-openssl-1.1.x","debian-openssl-3.0.x","rhel-openssl-1.0.x","rhel-openssl-1.1.x","rhel-openssl-3.0.x","linux-arm64-openssl-1.0.x","linux-arm64-openssl-1.1.x","linux-arm64-openssl-3.0.x"]/g' ./prisma/schema.prisma
+        shell: bash
+
+      - name: 查看 Prisma schema.prisma
+        working-directory: ./backend
+        run: |
+          cat ./prisma/schema.prisma
+        shell: bash
+
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: |
+            ./backend/package-lock.json
+            ./frontend/package-lock.json
+
+      - name: 清理依赖缓存
+        run: |
+          rm -rf ./backend/node_modules ./backend/package-lock.json
+          rm -rf ./frontend/node_modules ./frontend/package-lock.json
+        shell: bash
+
+      - name: 安装后端依赖
+        working-directory: ./backend
+        run: npm install
+
+      - name: 安装前端依赖
+        working-directory: ./frontend
+        run: npm install
+
+      - name: 生成 Prisma 客户端
+        working-directory: ./backend
+        run: npx prisma generate
+
+      - name: 构建后端
+        working-directory: ./backend
+        run: npm run build
+
+      - name: 构建前端
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 准备打包目录
+        run: |
+          mkdir -p package/all/backend
+          mkdir -p package/all/frontend
+          cp -r backend/dist/* package/all/backend/
+          cp -r frontend/build/* package/all/frontend/
+        shell: bash
+
+      - name: 创建平台架构目录，并复制 Prisma 引擎文件 , 复制前端文件，复制后端文件[不包含 .node 文件(Prisma 引擎文件)]
+        run: |
+          for f in $(find package/all/backend/client -name "libquery_engine-*.dylib.node"); do
+            name=$(echo "$f" | sed -n 's/.*libquery_engine-\(.*\).dylib.node/\1/p')
+            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/frontend"
+            cp "$f" "package/$name/backend/client/"
+            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
+          done
+          for f in $(find package/all/backend/client -name "libquery_engine-*.so.node"); do
+            name=$(echo "$f" | sed -n 's/.*libquery_engine-\(.*\).so.node/\1/p')
+            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/frontend"
+            cp "$f" "package/$name/backend/client/"
+            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
+          done
+          for f in $(find package/all/backend/client -name "query_engine-*.dll.node"); do
+            name=$(echo "$f" | sed -n 's/.*query_engine-\(.*\).dll.node/\1/p')
+            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/frontend"
+            cp "$f" "package/$name/backend/client/"
+            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
+          done
+        shell: bash
+
+      - name: 查看 package 目录树
+        run: |
+          tree package
+        shell: bash
+
+      - name: 打包平台架构特定的压缩包
+        run: |
+          for dir in package/*; do
+            if [[ -d "$dir" ]]; then
+              name=$(basename "$dir")
+              if [[ "$name" == "all" ]]; then
+                tar -czf "pm-all.tar.gz" -C "$dir" .
+                zip -r "pm-all.zip" "$dir"/*
+              elif [[ "$name" == *"windows"* ]]; then
+                zip -r "pm-${name}.zip" "$dir"/*
+              else
+                tar -czf "pm-${name}.tar.gz" -C "$dir" .
+              fi
+            fi
+          done
+        shell: bash
+
+      - name: 查看打包结果
+        run: |
+          ls -lh pm-*.tar.gz pm-*.zip
+        shell: bash
+
+      - name: 上传文件到 GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            pm-*.tar.gz
+            pm-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ========================================================================
+      # 修改 发布信息
+      # ========================================================================
+
+      - name: 读取 Release 信息
+        id: read_release
+        run: |
+          echo "release_name=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+          echo "release_tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          {
+            echo 'release_body<<EOF'
+            echo "${{ github.event.release.body }}"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          echo "release_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
+          echo "release_date=${{ github.event.release.published_at }}" >> $GITHUB_OUTPUT
+          echo "release_author=${{ github.event.release.author.login }}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: 读取下载说明
+        id: read_download
+        run: |
+          {
+            echo 'download<<EOF'
+            tail -n +2 Download_instructions.md
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: 修改发布信息
+        run: |
+          cat > release_notes.md <<EOF
+          # 更新日志
+          <details open>
+          <summary>点击展开/折叠</summary>
+          
+          ${{ steps.read_release.outputs.release_body }}
+          
+          </details>
+
+          ---
+
+          # 下载说明
+          <details>
+          <summary>点击展开/折叠</summary>
+          ${{ steps.read_download.outputs.download }}
+          </details>
+          EOF
+
+          gh release edit ${{ github.event.release.tag_name }} --notes-file release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
