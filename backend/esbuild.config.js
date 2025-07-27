@@ -6,10 +6,19 @@
  * 用于生产环境的代码构建和部署
  */
 const esbuild = require('esbuild');
+const { copy } = require('esbuild-plugin-copy');
 
 esbuild.build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   platform: 'node',
-  outfile: 'dist/index.js'
+  outfile: 'dist/index.js',
+  plugins: [
+    copy({
+      assets: [{
+        from: './node_modules/.prisma/client/*',
+        to: './.prisma/client',
+      }]
+    })
+  ]
 }).catch(() => process.exit(1));

@@ -72,41 +72,41 @@ jobs:
         run: |
           mkdir -p package/all/backend
           mkdir -p package/all/frontend
-          cp -r backend/dist/* package/all/backend/
-          cp -r frontend/build/* package/all/frontend/
+          rsync -av backend/dist/ package/all/backend/
+          rsync -av frontend/build/ package/all/frontend/
         shell: bash
 
       - name: 创建平台架构目录，并复制 Prisma 引擎文件 , 复制前端文件，复制后端文件[不包含 .node 文件(Prisma 引擎文件)]
         run: |
-          for f in $(find package/all/backend/client -name "libquery_engine-*.dylib.node"); do
+          for f in $(find package/all/backend/.prisma/client -name "libquery_engine-*.dylib.node"); do
             name=$(echo "$f" | sed -n 's/.*libquery_engine-\(.*\).dylib.node/\1/p')
-            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/backend/.prisma/client"
             mkdir -p "package/$name/frontend"
-            cp "$f" "package/$name/backend/client/"
-            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av "$f" "package/$name/backend/.prisma/client/"
+            rsync -av package/all/frontend/* "package/$name/frontend/"
             rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
           done
-          for f in $(find package/all/backend/client -name "libquery_engine-*.so.node"); do
+          for f in $(find package/all/backend/.prisma/client -name "libquery_engine-*.so.node"); do
             name=$(echo "$f" | sed -n 's/.*libquery_engine-\(.*\).so.node/\1/p')
-            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/backend/.prisma/client"
             mkdir -p "package/$name/frontend"
-            cp "$f" "package/$name/backend/client/"
-            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av "$f" "package/$name/backend/.prisma/client/"
+            rsync -av package/all/frontend/* "package/$name/frontend/"
             rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
           done
-          for f in $(find package/all/backend/client -name "query_engine-*.dll.node"); do
+          for f in $(find package/all/backend/.prisma/client -name "query_engine-*.dll.node"); do
             name=$(echo "$f" | sed -n 's/.*query_engine-\(.*\).dll.node/\1/p')
-            mkdir -p "package/$name/backend/client"
+            mkdir -p "package/$name/backend/.prisma/client"
             mkdir -p "package/$name/frontend"
-            cp "$f" "package/$name/backend/client/"
-            cp -r package/all/frontend/* "package/$name/frontend/"
+            rsync -av "$f" "package/$name/backend/.prisma/client/"
+            rsync -av package/all/frontend/* "package/$name/frontend/"
             rsync -av --exclude='*.node' package/all/backend/ package/$name/backend/
           done
         shell: bash
 
-      - name: 查看 package 目录树
+      - name: 查看 package 目录树(包括隐藏文件)
         run: |
-          tree package
+          tree package -a
         shell: bash
 
       - name: 打包平台架构特定的压缩包
@@ -178,8 +178,6 @@ jobs:
           ${{ steps.read_release.outputs.release_body }}
           
           </details>
-
-          ---
 
           # 下载说明
           <details>

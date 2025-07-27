@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "node esbuild.config.js",
-    "postbuild": "cp -r node_modules/.prisma/client dist/ || xcopy /E /I node_modules\\.prisma\\client dist\\.prisma\\client",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
