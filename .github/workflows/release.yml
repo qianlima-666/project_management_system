@@ -170,7 +170,7 @@ jobs:
 
       - name: 修改发布信息
         run: |
-          cat > release_notes.md <<EOF
+          cat > release_notes.md <<'EOF'
           # 更新日志
           <details open>
           <summary>点击展开/折叠</summary>
