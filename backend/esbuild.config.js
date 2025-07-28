@@ -12,13 +12,18 @@ esbuild.build({
   entryPoints: ['src/index.ts'],
   bundle: true,
   platform: 'node',
-  outfile: 'dist/index.js',
+  outdir: 'dist',
   plugins: [
     copy({
       assets: [{
         from: './node_modules/.prisma/client/*',
         to: './.prisma/client',
-      }]
+      },
+      {
+        from: './prisma/*',
+        to: './prisma/',
+      }
+    ]
     })
   ]
 }).catch(() => process.exit(1));
