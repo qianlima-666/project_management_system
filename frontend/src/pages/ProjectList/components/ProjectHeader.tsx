@@ -34,6 +34,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onRefetch,
   setSelectedRowKeys
 }) => {
+  const [searchValue, setSearchValue] = React.useState('')
   // 批量删除选中项目
   const handleBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
@@ -104,10 +105,16 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           placeholder="搜索项目..."
           prefix={<SearchOutlined />}
           allowClear
-          onChange={(e) => onSearch(e.target.value)}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onPressEnter={() => onSearch(searchValue)}
           style={{ width: 240 }}
           maxLength={32}
         />
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={() => onSearch(searchValue)}
+        ></Button>
 
         <Button type="primary" icon={<PlusOutlined />} onClick={onNewProject}>
           新建项目

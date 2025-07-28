@@ -13,6 +13,7 @@ import {
   ProjectDeleteSchema
 } from '../validators/project'
 import { ProjectService } from '../services/project.service'
+import { config } from '../config'
 
 
 const projects = new Hono()
@@ -157,4 +158,14 @@ projects.delete('/delete/all',
     }
   }
 )
+
+// 获取排除的项目名称
+projects.get('/exclude-names', (c) => {
+  const excludeProjectNames = config.excludeProjectNames
+  return c.json({
+    success: true,
+    data: excludeProjectNames
+  })
+})
+
 export default projects

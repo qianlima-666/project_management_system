@@ -9,19 +9,22 @@ import { DatabaseConnection } from './database/connection'
 import { DatabaseMigration } from './database/migration'
 import { redisClient } from './lib/redis'
 import { isPortInUse } from './utils/port.util'
+import { log } from 'node:console'
 
 console.log('🚀 项目管理系统后端服务启动中...')
-console.log(`🌐 前端域名: ${config.cors.origin.join(', ')}`)
 
 const app = createApp()
 
 // 优雅关闭
 process.on('SIGINT', async () => {
+  console.log('\n\n👋 服务已停止')
   console.log('🔄 正在关闭服务...')
   await Promise.all([
     redisClient.quit(),
-    DatabaseConnection.disconnect()
+    DatabaseConnection.disconnect(),
   ])
+  console.log('✅ 服务已成功关闭')
+  console.log('👋 感谢使用项目管理系统！')
   process.exit()
 })
 
@@ -35,26 +38,23 @@ async function startServer() {
     }
 
     // 连接数据库
-    const dbConnected = await DatabaseConnection.connect()
-    if (!dbConnected) {
-      console.log('❌ 数据库连接失败，服务无法启动')
-      process.exit(1)
-    }
+    await DatabaseConnection.connect()
 
     // 初始化数据库
-    const dbInitialized = await DatabaseMigration.initialize()
-    if (!dbInitialized) {
-      console.log('⚠️ 数据库表初始化失败，但服务将继续启动')
-      console.log('💡 请检查数据库配置并手动运行: npx prisma db push')
-    }
+    await DatabaseMigration.initialize()
 
     // 启动服务器
     serve({
       fetch: app.fetch,
       port: config.port,
     })
-    
-    console.log(`✅ 服务器正在运行在端口 ${config.port}`)
+
+    console.log(`\n\n🎉 服务已成功启动🚀！`);
+    console.log(`🚀  后端服务已启动，正在运行在端口 ${config.port}`)
+    console.log(`🌐 访问地址: http://localhost:${config.port}`);
+    console.log(`🌐 已授权前端域名: ${config.cors.origin.join(', ')}`)
+    console.log(`🌐 批量上传 排除的项目名称: ${config.excludeProjectNames.join(', ')}`)
+
   } catch (error) {
     console.error('❌ 服务启动失败:', error)
     process.exit(1)

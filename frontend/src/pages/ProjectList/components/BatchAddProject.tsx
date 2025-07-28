@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { Modal, Button, Upload, Table, message, Pagination, Spin, Input } from 'antd'
 import { SearchOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
 import * as XLSX from 'xlsx'
-import { batchAddProjects } from '@/api/projectService'
+import { batchAddProjects, getExcludeProjectNames } from '@/api/projectService'
 
 // 批量添加项目组件参数
 interface BatchAddProps {
@@ -46,18 +46,29 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
     const [projects, setProjects] = useState<ExcelProject[]>([]) // 存储去重后的项目数据
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]) // 存储选中的项目名称
     const [loading, setLoading] = useState(false) // 控制加载状态
+    const [excludeProjectNamesCount, setExcludeProjectNamesCount] = useState(0) // 排除项目名称计数
     // 解析 Excel 文件
-    const handleUpload = (file: File) => {
+    const handleUpload = async (file: File) => {
         const reader = new FileReader()
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             const data = new Uint8Array(e.target?.result as ArrayBuffer)
             const workbook = XLSX.read(data, { type: 'array' })
             const sheetName = workbook.SheetNames[0]
             const worksheet = workbook.Sheets[sheetName]
             const json: Array<Record<string, any>> = XLSX.utils.sheet_to_json(worksheet)
-            setExcelProjects(json)
+            const excludeNames = (await getExcludeProjectNames()).data; // 获取 排除项目名称列表
+            const filteredJson = json.filter(item => {
+                if (!excludeNames.includes(item["项目名称"])) {
+                    return true;
+                } else {
+                    setExcludeProjectNamesCount(excludeProjectNamesCount + 1);
+                    return false;
+                }
+            });
+            
+            setExcelProjects(filteredJson)
             // 将 Excel 数据映射为 ExcelProject 类型
-            const mappedProjects: ExcelProject[] = json.map(item => ({
+            const mappedProjects: ExcelProject[] = filteredJson.map(item => ({
                 selected: true, // 默认选中
                 name: item["项目名称"] || '',
                 description: item["项目描述"] || '',
@@ -82,6 +93,7 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
         setSearchText('')
         setCurrentPage(1)
         setLoading(false)
+        setExcludeProjectNamesCount(0)
     }
     // 提交批量创建项目
     const handleSubmit = async () => {
@@ -185,7 +197,7 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
                         </span>
                         {excelProjects.length - projects.length > 0 && (
                             <span style={{ marginLeft: 16, color: '#faad14' }}>
-                                （已忽略 <b>{excelProjects.length - projects.length}</b> 个重复项目）
+                                （已忽略：<b>{excludeProjectNamesCount}</b> 个在排除项目名称列表的项目， <b>{excelProjects.length - projects.length - excludeProjectNamesCount}</b> 个重复的项目）
                             </span>
                         )}
                     </div>

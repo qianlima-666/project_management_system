@@ -5,7 +5,7 @@
  */
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // 项目接口响应格式
 export interface Project {
@@ -94,5 +94,11 @@ export const batchDeleteProjects = async (ids: number[]): Promise<ApiResponse<vo
 // 删除所有项目
 export const deleteAllProjects = async (): Promise<ApiResponse<void>> => {
   const response = await apiClient.delete('/projects/delete/all')
+  return response.data
+}
+
+// 获取排除的项目名称
+export const getExcludeProjectNames = async (): Promise<ApiResponse<string[]>> => {
+  const response = await apiClient.get('/projects/exclude-names')
   return response.data
 }
