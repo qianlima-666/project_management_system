@@ -1,3 +1,5 @@
+// 定义项目相关的 TypeScript 类型
+
 export interface Project {
   id: number
   name: string

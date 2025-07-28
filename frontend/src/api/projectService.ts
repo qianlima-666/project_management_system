@@ -1,8 +1,11 @@
+/**
+ * 项目管理系统前端 API 服务
+ * 提供与后端项目相关的 API 调用
+ * 包括项目的增删改查及批量操作
+ */
 import axios from 'axios'
 
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
-
 
 // 项目接口响应格式
 export interface Project {

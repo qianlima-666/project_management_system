@@ -41,8 +41,7 @@ export class DatabaseMigration {
     }
   }
 
-  // 检查必需的表是否存在
-  // 如果不存在则尝试自动迁移
+  // 检查必需的表是否存在，如果不存在则尝试自动迁移
   private static async checkRequiredTables(): Promise<boolean> {
     try {
       const models = this.getModelsFromSchema()

@@ -9,9 +9,11 @@
 import { PrismaClient } from '@prisma/client'
 import { config } from '../config'
 
+// 数据库连接管理器
 export class DatabaseConnection {
   private static instance: PrismaClient
-  
+
+  // 获取单例实例
   static getInstance(): PrismaClient {
     if (!DatabaseConnection.instance) {
       DatabaseConnection.instance = new PrismaClient({
@@ -20,7 +22,8 @@ export class DatabaseConnection {
     }
     return DatabaseConnection.instance
   }
-  
+
+  // 连接、断开和健康检查方法
   static async connect(): Promise<boolean> {
     try {
       const prisma = DatabaseConnection.getInstance()
@@ -36,7 +39,8 @@ export class DatabaseConnection {
       return false
     }
   }
-  
+
+  // 断开数据库连接
   static async disconnect(): Promise<void> {
     try {
       const prisma = DatabaseConnection.getInstance()
@@ -47,6 +51,7 @@ export class DatabaseConnection {
     }
   }
   
+  // 健康检查方法
   static async healthCheck() {
     try {
       const prisma = DatabaseConnection.getInstance()

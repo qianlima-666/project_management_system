@@ -35,7 +35,9 @@ const ProjectList: React.FC = () => {
 
   return (
     <>
+      {/* 项目列表头部 */}
       <Card variant="outlined">
+        {/* 项目搜索和操作 */}
         <ProjectHeader
           selectedRowKeys={selectedRowKeys}
           onSearch={handleSearch}
@@ -45,6 +47,7 @@ const ProjectList: React.FC = () => {
           setSelectedRowKeys={setSelectedRowKeys}
         />
 
+        {/* 项目列表表格 */}
         <ProjectTable
           data={projectsData?.data || []}
           loading={isLoading}
@@ -55,6 +58,7 @@ const ProjectList: React.FC = () => {
           onDelete={handleDelete}
         />
 
+        {/* 项目列表分页 */}
         <ProjectPagination
           current={page}
           pageSize={limit}
@@ -64,6 +68,7 @@ const ProjectList: React.FC = () => {
         />
       </Card>
 
+      {/* 新建项目模态框 */}
       <NewProject
         visible={modalVisible && modalType === 'new'}
         onCancel={handleModalClose}
@@ -71,6 +76,7 @@ const ProjectList: React.FC = () => {
         project={currentProject}
       />
 
+      {/* 批量添加项目模态框 */}
       <BatchAddProject
         visible={modalVisible && modalType === 'batch'}
         onCancel={handleModalClose}

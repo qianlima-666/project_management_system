@@ -43,9 +43,9 @@ const BatchAddProject: React.FC<BatchAddProps> = ({
     onSuccess,
 }) => {
     const [excelProjects, setExcelProjects] = useState<Array<Record<string, any>>>([]) // 存储 Excel 解析后的原始数据
-    const [projects, setProjects] = useState<ExcelProject[]>([])
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-    const [loading, setLoading] = useState(false)
+    const [projects, setProjects] = useState<ExcelProject[]>([]) // 存储去重后的项目数据
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]) // 存储选中的项目名称
+    const [loading, setLoading] = useState(false) // 控制加载状态
     // 解析 Excel 文件
     const handleUpload = (file: File) => {
         const reader = new FileReader()

@@ -1,3 +1,8 @@
+/**
+ * 项目管理系统前端布局组件
+ * 该组件使用 Ant Design 的 Layout 组件来构建应用的整体布局
+ * 包括头部、内容区和页脚
+ */
 import React from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import { Link } from 'react-router-dom'

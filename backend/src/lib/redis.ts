@@ -8,6 +8,7 @@
  */
 import { createClient } from 'redis'
 
+// Redis 客户端配置
 export const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   socket: {
@@ -21,11 +22,12 @@ export const redisClient = createClient({
   },
 });
 
-
+// 连接 Redis 客户端
 redisClient.connect().then(() => {
   console.log('✅ Redis 连接成功');
 });
 
+// 监听连接错误
 redisClient.on('error', (err) => {
   console.error('❌ Redis 连接错误:', err);
 });

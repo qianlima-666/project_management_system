@@ -6,21 +6,25 @@ import { prisma } from '../database/connection'
 import { LogService } from './log.service'
 import { CacheService } from './cache.service'
 
+// 项目创建和更新数据接口
 export interface ProjectCreateData {
   name: string
   description?: string | null
 }
 
+// 项目更新数据接口
 export interface ProjectUpdateData extends ProjectCreateData {
   id: number
 }
 
+// 项目查询参数接口
 export interface ProjectQueryParams {
   page: number
   limit: number
   search?: string
 }
 
+// 项目服务类
 export class ProjectService {
   private static readonly CACHE_PREFIX = 'projects'
   private static readonly CACHE_TTL = 60
@@ -45,6 +49,7 @@ export class ProjectService {
       ],
     } : {}
     
+    // 使用 Prisma 查询项目列表和总数
     const [projects, total] = await Promise.all([
       prisma.project.findMany({
         where,
@@ -55,6 +60,7 @@ export class ProjectService {
       prisma.project.count({ where }),
     ])
     
+    // 构建结果对象
     const result = {
       success: true,
       data: projects,
@@ -119,6 +125,7 @@ export class ProjectService {
       }
     }
     
+    // 更新项目
     const project = await prisma.project.update({
       where: { id },
       data: updateData,
