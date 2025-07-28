@@ -1,7 +1,7 @@
 // 自定义 Hook 管理状态
 // Hook 用于处理项目列表的状态和逻辑
 import { useState } from 'react'
-import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { message } from 'antd'
 import { fetchProjects, deleteProject } from '@/api/projectService'
 import type { Project, ProjectsResponse } from '@/types/project'

@@ -76,8 +76,8 @@ const SideBar: React.FC<SideBarProps> = ({
     };
 
     // 选择树形节点的回调
-    const onSelect: TreeProps['onSelect'] = (selectedKeysValue, info) => {
-        // console.log('选择树形节点的回调', info);
+    const onSelect: TreeProps['onSelect'] = (selectedKeysValue, _info) => {
+        // console.log('选择树形节点的回调', _info);
         setSelectedKeys(selectedKeysValue);
     };
 
