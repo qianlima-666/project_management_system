@@ -24,8 +24,23 @@ jobs:
       - name: 修改 Prisma schema.prisma [添加所有平台和架构]
         working-directory: ./backend
         run: |
-          sed -i 's/binaryTargets = .*/binaryTargets = ["darwin","darwin-arm64","windows","linux-musl-openssl-3.0.x","linux-musl","linux-musl-arm64-openssl-3.0.x","linux-musl-arm64-openssl-1.1.x","debian-openssl-1.0.x","debian-openssl-1.1.x","debian-openssl-3.0.x","rhel-openssl-1.0.x","rhel-openssl-1.1.x","rhel-openssl-3.0.x","linux-arm64-openssl-1.0.x","linux-arm64-openssl-1.1.x","linux-arm64-openssl-3.0.x"]/g' ./prisma/schema.prisma
+          if grep -q 'binaryTargets' ./prisma/schema.prisma; then
+            sed -i 's|binaryTargets = .*|binaryTargets = ["darwin","darwin-arm64","windows","linux-musl-openssl-3.0.x","linux-musl","linux-musl-arm64-openssl-3.0.x","linux-musl-arm64-openssl-1.1.x","debian-openssl-1.0.x","debian-openssl-1.1.x","debian-openssl-3.0.x","rhel-openssl-1.0.x","rhel-openssl-1.1.x","rhel-openssl-3.0.x","linux-arm64-openssl-1.0.x","linux-arm64-openssl-1.1.x","linux-arm64-openssl-3.0.x"]|g' ./prisma/schema.prisma
+          else
+            sed -i 's|generator client {|generator client {\n  binaryTargets = ["darwin","darwin-arm64","windows","linux-musl-openssl-3.0.x","linux-musl","linux-musl-arm64-openssl-3.0.x","linux-musl-arm64-openssl-1.1.x","debian-openssl-1.0.x","debian-openssl-1.1.x","debian-openssl-3.0.x","rhel-openssl-1.0.x","rhel-openssl-1.1.x","rhel-openssl-3.0.x","linux-arm64-openssl-1.0.x","linux-arm64-openssl-1.1.x","linux-arm64-openssl-3.0.x"]|g' ./prisma/schema.prisma
+          fi
         shell: bash
+
+      - name:  修改启动 .env 的 VITE_API_BASE_URL
+        working-directory: ./frontend
+        run: |
+          sed -i 's|VITE_API_BASE_URL=.*|VITE_API_BASE_URL="/api"|g' .env
+        shell: bash
+
+      - name: 查看 .env 文件
+        working-directory: ./frontend
+        run: |
+          cat .env
 
       - name: 查看 Prisma schema.prisma
         working-directory: ./backend

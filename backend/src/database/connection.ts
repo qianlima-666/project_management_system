@@ -7,8 +7,6 @@
  * 包含连接状态监控和错误处理
  */
 import { PrismaClient } from '@prisma/client'
-import { execSync } from 'child_process'
-import { PrismaClientInitializationError } from '@prisma/client/runtime/library'
 
 // 数据库连接管理器
 export class DatabaseConnection {
@@ -35,14 +33,8 @@ export class DatabaseConnection {
       console.log('✅ 数据库查询测试成功')
 
     } catch (error) {
-      // "PrismaClientInitializationError" 是 Prisma 客户端初始化错误
-      if (error instanceof PrismaClientInitializationError) {
-        console.error('❌ 数据库连接失败，可能是 Prisma 客户端错误，请下载对应的 版本，或手动执行 npx prisma generate')
-        process.exit(1)
-      } else {
-        console.error('❌ 数据库连接失败:', error)
-        process.exit(1)
-      }
+      console.error('❌ 数据库连接失败:', error)
+      process.exit(1)
     }
   }
 
