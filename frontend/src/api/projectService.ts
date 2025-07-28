@@ -46,11 +46,11 @@ const apiClient = axios.create({
 export const fetchProjects = async (
   page: number = 1,
   limit: number = 10,
-  search?: string
+  search?: string,
+  chinaRegion?: React.Key[]
 ): Promise<ApiResponse<Project[]>> => {
-  const response = await apiClient.get('/projects', {
-    params: { page, limit, search }
-  })
+  const params: any = { page, limit, search, chinaRegion }
+  const response = await apiClient.post('/projects/get', params)
   return response.data
 }
 

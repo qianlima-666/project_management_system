@@ -6,14 +6,17 @@ import { message } from 'antd'
 import { fetchProjects, deleteProject } from '@/api/projectService'
 import type { Project, ProjectsResponse } from '@/types/project'
 
+// 自定义 Hook
 export const useProjectList = () => {
-  const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(10)
-  const [search, setSearch] = useState('')
-  const [modalVisible, setModalVisible] = useState(false)
-  const [modalType, setModalType] = useState<'new' | 'batch' | null>(null)
-  const [currentProject, setCurrentProject] = useState<Project | null>(null)
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  // const [isLoading, setIsLoading] = useState(false) // 加载状态
+  const [page, setPage] = useState(1) // 当前页码
+  const [limit, setLimit] = useState(10) // 每页显示的项目数量
+  const [search, setSearch] = useState('') // 搜索关键词
+  const [modalVisible, setModalVisible] = useState(false) // 控制模态框的显示和隐藏
+  const [modalType, setModalType] = useState<'new' | 'batch' | null>(null) // 模态框类型：新建或批量添加
+  const [currentProject, setCurrentProject] = useState<Project | null>(null) // 当前编辑的项目
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]) // 选中的行键
+  const [selectedChinaRegion, setSelectedChinaRegion] = useState<React.Key[]>([]) // 省市县筛选
 
   const {
     data: projectsData,
@@ -21,16 +24,21 @@ export const useProjectList = () => {
     isError,
     refetch
   } = useQuery<ProjectsResponse>({
-    queryKey: ['projects', page, limit, search],
-    queryFn: () => fetchProjects(page, limit, search),
-    placeholderData: keepPreviousData,
+    queryKey: ['projects', page, limit, search, selectedChinaRegion],
+    queryFn: async () => await fetchProjects(page, limit, search, selectedChinaRegion),
+    staleTime: 1000 * 60 * 5, // 数据在5分钟内不会过期
+    // placeholderData: keepPreviousData,
   })
 
+  // 处理搜索
+  // 例如：输入搜索关键词时调用
   const handleSearch = (value: string) => {
-    setSearch(value)
-    setPage(1)
+    setSearch(value) // 更新搜索关键词
+    setPage(1) // 重置页码为1
   }
 
+  // 处理删除项目
+  // 例如：点击删除按钮时调用
   const handleDelete = async (id: number) => {
     try {
       await deleteProject(id)
@@ -41,33 +49,44 @@ export const useProjectList = () => {
     }
   }
 
+  // 处理编辑项目
   const handleEdit = (project: Project) => {
-    setCurrentProject(project)
-    setModalType('new')
-    setModalVisible(true)
+    setCurrentProject(project) // 设置当前编辑的项目
+    setModalType('new') // 设置模态框类型为编辑
+    setModalVisible(true) // 打开模态框
   }
 
+  // 处理新建项目
+  // 例如：点击新建按钮时打开模态框
   const handleNewProject = () => {
-    setCurrentProject(null)
-    setModalType('new')
-    setModalVisible(true)
+    setCurrentProject(null) // 清空当前项目
+    setModalType('new') // 设置模态框类型为新建
+    setModalVisible(true) // 打开模态框
   }
 
+  // 批量添加项目
   const handleBatchAdd = () => {
-    setCurrentProject(null)
-    setModalType('batch')
-    setModalVisible(true)
+    setCurrentProject(null) // 清空当前项目
+    setModalType('batch') // 设置模态框类型为批量添加
+    setModalVisible(true) // 打开模态框
   }
 
+  // 处理模态框关闭
+  // 例如：取消添加或编辑项目
   const handleModalClose = () => {
-    setModalVisible(false)
+    setModalVisible(false) // 关闭模态框
+    setCurrentProject(null) // 清空当前项目
   }
 
+  // 处理模态框成功操作
+  // 例如：添加或编辑项目后刷新数据
   const handleModalSuccess = () => {
-    setModalVisible(false)
-    refetch()
+    setModalVisible(false) // 关闭模态框
+    setCurrentProject(null) // 清空当前项目
+    refetch() // 刷新项目列表数据
   }
 
+  // 分页处理
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPage(page)
     setLimit(pageSize)
@@ -85,7 +104,7 @@ export const useProjectList = () => {
     projectsData,
     isLoading,
     isError,
-    
+    selectedChinaRegion,
     // 方法
     handleSearch,
     handleDelete,
@@ -96,6 +115,7 @@ export const useProjectList = () => {
     handleModalSuccess,
     handlePaginationChange,
     setSelectedRowKeys,
-    refetch
+    setSelectedChinaRegion,
+    refetch,
   }
 }

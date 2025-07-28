@@ -2,7 +2,7 @@
  * 项目列表页头部操作栏组件
  * 包含搜索、新建、批量添加、批量删除、清空等操作
  */
-import React from 'react'
+import React, { useState } from 'react'
 import { Input, Button, Space, Typography, Popconfirm, message } from 'antd'
 import {
   SearchOutlined,
@@ -34,7 +34,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onRefetch,
   setSelectedRowKeys
 }) => {
-  const [searchValue, setSearchValue] = React.useState('')
+  const [searchValue, setSearchValue] = useState('')
   // 批量删除选中项目
   const handleBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
@@ -101,25 +101,22 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           gap: 8,
         }}
       >
-        <Input
+        <Input.Search
+          value={searchValue}
           placeholder="搜索项目..."
           prefix={<SearchOutlined />}
           allowClear
           onChange={(e) => setSearchValue(e.target.value)}
           onPressEnter={() => onSearch(searchValue)}
+          onSearch={() => onSearch(searchValue)}
           style={{ width: 240 }}
           maxLength={32}
         />
-        <Button
-          type="primary"
-          icon={<SearchOutlined />}
-          onClick={() => onSearch(searchValue)}
-        ></Button>
 
         <Button type="primary" icon={<PlusOutlined />} onClick={onNewProject}>
           新建项目
         </Button>
-        
+
         <Button type="primary" icon={<UploadOutlined />} onClick={onBatchAdd}>
           批量添加
         </Button>

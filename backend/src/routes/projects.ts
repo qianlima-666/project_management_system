@@ -20,18 +20,18 @@ const projects = new Hono()
 
 
 // 获取项目列表
-projects.get('/', zValidator('query', PaginationSchema),
+projects.post('/get', zValidator('json', PaginationSchema),
   async (c) => {
     try {
-      const query = c.req.valid('query')
-      const { page, limit, search } = query
-      const result = await ProjectService.findMany({ page, limit, search })
+      const json = c.req.valid('json')
+      const { page, limit, search, chinaRegion } = json
+
+      const result = await ProjectService.findMany({ page, limit, search, chinaRegion })
       return c.json(result)
     } catch (error) {
       console.error('获取项目时出错:', error)
       return c.json({ success: false, error: '服务器内部错误' }, 500)
     }
-
   }
 )
 

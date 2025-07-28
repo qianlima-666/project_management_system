@@ -6,9 +6,10 @@ import { z } from 'zod'
 
 // 分页查询的验证规则
 export const PaginationSchema = z.object({
-  page: z.string().transform(Number),
-  limit: z.string().transform(Number),
+  page: z.number().min(1).transform(Number),
+  limit: z.number().min(1).transform(Number),
   search: z.string().optional(),
+  chinaRegion: z.array(z.string()).optional(), // 省市县筛选
 })
 
 // 项目创建的验证规则

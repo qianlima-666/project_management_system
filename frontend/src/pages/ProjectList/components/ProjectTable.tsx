@@ -87,6 +87,16 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
     }
   ]
 
+  // 设置表格高度，避免过高导致滚动条不友好
+  // 100vh - ant-layout-header 标签 - ant-layout-footer 标签 - project-header 标签 - pagination-container 标签
+  // 获取 ant-layout-header 高度
+  const headerHeight = document.querySelector('.ant-layout-header')?.clientHeight || 0
+  const footerHeight = document.querySelector('.ant-layout-footer')?.clientHeight || 0
+  const projectHeaderHeight = document.querySelector('.project-header')?.clientHeight || 0
+  const paginationContainerHeight = document.querySelector('.pagination-container')?.clientHeight || 0
+  const tableHeight = `calc(100vh - ${headerHeight + footerHeight + projectHeaderHeight + paginationContainerHeight + 80}px)`
+  document.querySelector('.project-table')?.setAttribute('style', `height: ${tableHeight}; overflow-y: auto;`)
+
   // 渲染表格
   return (
     <Spin spinning={loading}>
@@ -97,14 +107,16 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
         }}
         columns={columns}
         dataSource={data}
-        locale={error || data === null ? {
-          emptyText: <div style={{ textAlign: 'center', margin: 20 }}>加载项目失败，请稍后重试</div>,
-        } : {}}
+        locale={
+          error || data === null
+            ? { emptyText: <div style={{ textAlign: 'center', margin: 20 }}>加载项目失败，请稍后重试</div> }
+            : (!loading && data && data.length === 0)
+              ? { emptyText: <div style={{ textAlign: 'center', margin: 20 }}>暂无项目数据</div> }
+              : {}
+        }
         rowKey="id"
         pagination={false}
         className="project-table"
-        // 设置表格高度，避免过高导致滚动条不友好
-        scroll={{ y: 'calc(100vh - 320px)' }}
         bordered
       />
     </Spin>
